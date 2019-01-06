@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cowboy Game</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
+    </head>
+    <body>
+        
+        <!-- Load all the game assets -->
+        <div id="resources">
+            <img id="backgroundImage" src="assets/background.png">
+            <img id="downImage" src="assets/down.png">
+            <img id="upImage" src="assets/up.png">
+            <img id="leftImage" src="assets/left.png">
+            <img id="rightImage" src="assets/right.png">
+        </div>
+
+        <!-- Game canvas -->
+        <canvas width="1280" height="720" id="gameCanvas"></canvas>
+
+        <!-- Libraries -->
+        <script
+			  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+			  integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+              crossorigin="anonymous"></script>
+
+        <!-- Game scripts -->
+        <script src="js/player.js"></script>
+        <script src="js/bullet.js"></script>
+        <script src="js/main.js"></script>
+
+    </body>
+</html>
