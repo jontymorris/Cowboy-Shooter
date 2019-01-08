@@ -1,6 +1,6 @@
 // Canvas
 var canvas = document.getElementById("gameCanvas");
-var ctx = canvas.getContext("2d");
+var ctx    = canvas.getContext("2d");
 
 var canvasWidth;
 var canvasHeight;
@@ -9,14 +9,17 @@ var virtualHeight;
 
 // Assets
 var backgroundImage = document.getElementById("backgroundImage");
-var leftImage = document.getElementById("leftImage");
-var rightImage = document.getElementById("rightImage");
-var downImage = document.getElementById("downImage");
-var upImage = document.getElementById("upImage");
+var leftImage       = document.getElementById("leftImage");
+var rightImage      = document.getElementById("rightImage");
+var downImage       = document.getElementById("downImage");
+var upImage         = document.getElementById("upImage");
+var bloodImage      = document.getElementById("bloodImage");
 
 // Game variables
-var player1;
-var player2;
+var players;
+var hud;
+var tickRate;
+var scoreIncrement;
 
 /**
  * Init the game
@@ -31,40 +34,75 @@ function init() {
 
     resizeCanvas();
     
-    player1 = new Player(100, 100, {right: 39, left: 37, up: 38, down: 40, fire: 13});
-    player2 = new Player(300, 100, {right: 68, left: 65, up: 87, down: 83, fire: 70});
+    players = [];
+    players.push(new Player(100, 100, {right: 39, left: 37, up: 38, down: 40, fire: 13}));
+    players.push(new Player(300, 100, {right: 68, left: 65, up: 87, down: 83, fire: 70}));
 
-    setInterval(update, 1000/60);
+
+    // Get each players enemys
+    for (let index = 0; index < players.length; index++) {
+        players[index].enemys = players.slice();
+        players[index].enemys.splice(index,1);
+    }
+
+    hud      = new Hud("white"); 
+    tickRate = 1000/60;
+    scoreIncrement = 10;
+    
+    setInterval(update, tickRate);
+}
+
+function concludeRound(winner){
+    winner.score += scoreIncrement;
+    // TODO: Reset players (new round)
 }
 
 /**
  * Resizes the game canvas so it adapts to the window
  */
 function resizeCanvas() {
-    $(canvas).width($(window).width() * 0.8);
+    $(canvas).width($(window).width());
     canvasWidth = $(canvas).width();
     canvasHeight = $(canvas).height();
 }
 
 // Key down events
 window.onkeydown = function(e) {
-    player1.keyDown(e.keyCode);
-    player2.keyDown(e.keyCode);
+    for (let index = 0; index < players.length; index++) {
+        players[index].keyDown(e.keyCode);
+    }
 }
 
 // Key up events
 window.onkeyup = function(e) {
-    player1.keyUp(e.keyCode);
-    player2.keyUp(e.keyCode);
+    for (let index = 0; index < players.length; index++) {
+        players[index].keyUp(e.keyCode);
+    }
 }
 
 /**
  * Updates all the game objects. Calls the draw method after updating.
  */
 function update() {
-    player1.update();
-    player2.update();
+    alive = 0;
+    for (let index = 0; index < players.length; index++) {
+        players[index].update();
+        if(players[index].health <= 0){
+            players[index].die();
+        }
+        else{
+            alive++;
+        }
+    }
 
+    if(alive <= 1){ // Is there only one person left?
+        for (let index = 0; index < players.length; index++) {
+            if(players[index].health > 0){
+                concludeRound(players[index]);
+                break;
+            }
+        }
+    }
     draw();
 }
 
@@ -72,10 +110,11 @@ function update() {
  * Draw all the game objects
  */
 function draw() {
-    ctx.drawImage(backgroundImage, 0, 0, canvasWidth, canvasHeight);
-
-    player1.draw(ctx);
-    player2.draw(ctx);
+    ctx.drawImage(backgroundImage, 0, 0, virtualWidth, virtualHeight);
+    for (let index = 0; index < players.length; index++) {
+        players[index].draw(ctx);
+    }
+    hud.draw(ctx)
 }
 
 init(); // Setup the game
