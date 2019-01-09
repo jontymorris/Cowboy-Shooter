@@ -14,47 +14,86 @@ var rightImage      = document.getElementById("rightImage");
 var downImage       = document.getElementById("downImage");
 var upImage         = document.getElementById("upImage");
 var bloodImage      = document.getElementById("bloodImage");
+var bulletImage     = document.getElementById("bulletImage");
+var healthImage     = document.getElementById("healthImage");
 
 // Game variables
 var players;
 var hud;
 var tickRate;
 var scoreIncrement;
+var rounds;
+var roundAmountForGameOver;
 
 /**
  * Init the game
  */
 function init() {
+    // Width/Height Settings
     virtualWidth = $(canvas).width();
     virtualHeight = $(canvas).height();
 
     $(window).resize(function() {
         resizeCanvas();
     })
-
     resizeCanvas();
     
+    // Game Variables
+    tickRate = 1000/60;
+    scoreIncrement = 1;
+    rounds = 0;
+    roundAmountForGameOver = 5;
+
+    // Establish Players
     players = [];
-    players.push(new Player(100, 100, {right: 39, left: 37, up: 38, down: 40, fire: 13}));
-    players.push(new Player(300, 100, {right: 68, left: 65, up: 87, down: 83, fire: 70}));
+    players.push(new Player(randomCoordinates(), {right: 39, left: 37, up: 38, down: 40, fire: 13}));
+    players.push(new Player(randomCoordinates(), {right: 68, left: 65, up: 87, down: 83, fire: 70}));
 
-
-    // Get each players enemys
+    // Give each player their enemies
     for (let index = 0; index < players.length; index++) {
         players[index].enemys = players.slice();
         players[index].enemys.splice(index,1);
+        players[index].name = "Player " + (index+1); 
     }
 
-    hud      = new Hud("white"); 
-    tickRate = 1000/60;
-    scoreIncrement = 10;
-    
+    // Init HUD
+    hud = new Hud("white"); 
+
+    // Start Game loop
     setInterval(update, tickRate);
 }
 
+function getWinners(){
+    winners = [players[0]]; // List incase of a tied game (2+ winners)
+
+    // Calculate winners
+    for (let index = 1; index < players.length; index++) {
+        // Player has higher score, replace all winners
+        if(players[index].score > winners[0].score){
+            winners = [players[index]];
+        }
+        // Player has same score, append to list (tie)
+        else if(players[index].score == winners[0].score){
+            winners.push(players[index]);
+        }
+    }
+    return winners;
+}
+
+// Calculate random X, Y values within screen
+function randomCoordinates(){
+    return [Math.random() * ((virtualWidth-70) - 0), Math.random() * ((virtualHeight-112) - 0)];
+}
+
+// Conclude and setup new round (or gameover trigger)
 function concludeRound(winner){
+    rounds++;
     winner.score += scoreIncrement;
-    // TODO: Reset players (new round)
+    for (let index = 0; index < players.length; index++) {
+        players[index].reset();
+    }
+    if(rounds >= roundAmountForGameOver){hud.gameOver = true;}
+    else{hud.newRound = true;}
 }
 
 /**
@@ -84,6 +123,8 @@ window.onkeyup = function(e) {
  * Updates all the game objects. Calls the draw method after updating.
  */
 function update() {
+
+    // Count how many players are alive
     alive = 0;
     for (let index = 0; index < players.length; index++) {
         players[index].update();
@@ -95,7 +136,8 @@ function update() {
         }
     }
 
-    if(alive <= 1){ // Is there only one person left?
+    // Only 1 Person alive, conclude round
+    if(alive <= 1){
         for (let index = 0; index < players.length; index++) {
             if(players[index].health > 0){
                 concludeRound(players[index]);
@@ -110,11 +152,17 @@ function update() {
  * Draw all the game objects
  */
 function draw() {
+
+    // Draw background
     ctx.drawImage(backgroundImage, 0, 0, virtualWidth, virtualHeight);
+
+    // Draw HUD
+    hud.draw(ctx);
+
+    // Draw players
     for (let index = 0; index < players.length; index++) {
         players[index].draw(ctx);
     }
-    hud.draw(ctx)
 }
 
 init(); // Setup the game

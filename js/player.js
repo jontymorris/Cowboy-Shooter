@@ -1,22 +1,24 @@
 class Player {
-    constructor(x, y, controls) {
-        this.x = x;
-        this.y = y;
-
+    constructor(coordinates, controls) {
+        this.name  = name;
         this.width = 70;
         this.height = 112;
-
         this.controls = controls;
-
         this.moveSpeed = 2;
-        this.dx = 0;
-        this.dy = 0;
 
-        this.bullets = [];
-        this.score   = 0;
-        this.ammo    = 100;
-        this.health  = 100;
-        this.enemys  = [];
+        this.startX = coordinates[0];
+        this.startY = coordinates[1];
+        this.score  = 0;
+        this.enemys = [];
+        this.maxAmmo = 100;
+
+        // Variables reset each round
+        this.reset();
+    }
+
+
+    toString(){
+        return this.name;
     }
 
     /**
@@ -109,6 +111,19 @@ class Player {
         }
     }
 
+    // Reset after round
+    reset(){
+        this.x = this.startX;
+        this.y = this.startY;
+
+        this.dx = 0;
+        this.dy = 0;
+
+        this.bullets = [];
+        this.ammo    = this.maxAmmo;
+        this.health  = 100;
+    }
+
     // Responce to bullet collision
     takeDamage(){
         this.justHit = true;
@@ -135,6 +150,12 @@ class Player {
         }
 
         if(this.health > 0){ // Is player alive?
+            
+            var currentFont = ctx.font; // Remember current font
+            ctx.font        = "20px Arial";
+
+            ctx.fillText(this.name, this.x, this.y); // Draw name on player head
+
             // Draw the player in the direction they're facing
             if (this.dx < 0) {
                 ctx.drawImage(leftImage, this.x, this.y, this.width, this.height);
@@ -148,6 +169,8 @@ class Player {
             else {
                 ctx.drawImage(downImage, this.x, this.y, this.width, this.height);
             }
+
+            ctx.font = currentFont; // Restore previous font
         }   
     }
 }
