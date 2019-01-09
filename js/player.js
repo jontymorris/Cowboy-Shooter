@@ -1,6 +1,6 @@
 class Player {
     constructor(coordinates, controls) {
-        this.name  = name;
+        this.name = "Unknown Player";
         this.width = 70;
         this.height = 112;
         this.controls = controls;
@@ -8,15 +8,43 @@ class Player {
 
         this.startX = coordinates[0];
         this.startY = coordinates[1];
-        this.score  = 0;
+        this.score = 0;
         this.enemys = [];
-        this.maxAmmo = 100;
+        this.maxAmmo  = 100;
+
+        this.timeSinceLastBullet = 0;
+        this.fireRate = tickRate*10;
 
         // Variables reset each round
         this.reset();
     }
+        
+    /**
+     * Reset variables after each round
+     */
+    reset(){
+        this.x = this.startX;
+        this.y = this.startY;
 
+        this.dx = 0;
+        this.dy = 0;
 
+        this.bullets = [];
+        this.ammo    = this.maxAmmo;
+        this.health  = 100;
+    }
+    
+    /**
+     * Responce to bullet collision
+    */
+    takeDamage(){
+        this.justHit = true;
+        this.health -= 10;
+    }
+
+    /**
+     * Give player's name when converting to string
+     */
     toString(){
         return this.name;
     }
@@ -39,11 +67,14 @@ class Player {
             this.dy = this.moveSpeed;
         }
 
-        // handle a bullet fire
+        // Spawn new bullet
         else if (keyCode == this.controls.fire) {
             if(this.ammo > 0){ // Does the player have ammo?
-                this.bullets.push(new Bullet(this));
-                this.ammo--;
+                if(this.timeSinceLastBullet >= this.fireRate){ // Has their been time between last bullet fire
+                    this.bullets.push(new Bullet(this));
+                    this.ammo--;
+                    this.timeSinceLastBullet = 0;
+                }
             }
         }
     }
@@ -73,6 +104,7 @@ class Player {
     update() {
         this.x += this.dx;
         this.y += this.dy;
+        this.timeSinceLastBullet += tickRate;
 
         // Check if the player has moved off the screen
         if (this.x < 0) {
@@ -94,8 +126,8 @@ class Player {
                 this.bullets.shift();
             }
         }
- 
-        // Update the players bullets
+        
+        //Update the players bullets
         for (let i=0; i < this.bullets.length; i++) {
             if(this.enemys.length > 0){
                 for (let index = 0; index < this.enemys.length; index++) {
@@ -109,29 +141,6 @@ class Player {
             }
             this.bullets[i].update();
         }
-    }
-
-    // Reset after round
-    reset(){
-        this.x = this.startX;
-        this.y = this.startY;
-
-        this.dx = 0;
-        this.dy = 0;
-
-        this.bullets = [];
-        this.ammo    = this.maxAmmo;
-        this.health  = 100;
-    }
-
-    // Responce to bullet collision
-    takeDamage(){
-        this.justHit = true;
-        this.health -= 10;
-    }
-
-    die(){
-        // TODO: Implement dieing (not be able to be hit any longer and don't render)
     }
 
     /**
@@ -150,11 +159,6 @@ class Player {
         }
 
         if(this.health > 0){ // Is player alive?
-            
-            var currentFont = ctx.font; // Remember current font
-            ctx.font        = "20px Arial";
-
-            ctx.fillText(this.name, this.x, this.y); // Draw name on player head
 
             // Draw the player in the direction they're facing
             if (this.dx < 0) {
@@ -169,8 +173,6 @@ class Player {
             else {
                 ctx.drawImage(downImage, this.x, this.y, this.width, this.height);
             }
-
-            ctx.font = currentFont; // Restore previous font
         }   
     }
 }

@@ -63,6 +63,9 @@ function init() {
     setInterval(update, tickRate);
 }
 
+/**
+* Get all winners at point in time
+ */
 function getWinners(){
     winners = [players[0]]; // List incase of a tied game (2+ winners)
 
@@ -80,12 +83,16 @@ function getWinners(){
     return winners;
 }
 
-// Calculate random X, Y values within screen
+/**
+* Calculate random X, Y values within screen
+ */
 function randomCoordinates(){
     return [Math.random() * ((virtualWidth-70) - 0), Math.random() * ((virtualHeight-112) - 0)];
 }
 
-// Conclude and setup new round (or gameover trigger)
+/**
+* Conclude and setup new round (or gameover trigger)
+ */
 function concludeRound(winner){
     rounds++;
     winner.score += scoreIncrement;
@@ -128,10 +135,7 @@ function update() {
     alive = 0;
     for (let index = 0; index < players.length; index++) {
         players[index].update();
-        if(players[index].health <= 0){
-            players[index].die();
-        }
-        else{
+        if(players[index].health > 0){
             alive++;
         }
     }

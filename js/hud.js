@@ -2,34 +2,37 @@ class Hud {
 
     constructor(color){
         // Font Settings
-        ctx.font      = "30px Arial";
-        this.color    = color;
+        this.fontPrimary        = "30px Arial";
+        this.fontSecondary      = "15px Arial";
+        this.fontExtra          = "10px Arial";
 
-        this.progressBarWidth  = 200;
-        this.progressBarHeight = 30;
-        this.healthBarColor = "green";
-        this.fillColor = "white";
-        this.iconSize  = 50;
+        // Main HUD Settings
+        this.progressBarWidth  = 100;
+        this.progressBarHeight = 10;
+        this.healthBarColor    = "green";
+        this.iconSize          = this.progressBarHeight*2;
+        this.color             = color;
 
         // Render for special events
-        this.newRound   = false;
-        this.gameOver   = false;
-        this.renderTime = tickRate * 100;
+        this.newRound          = false;
+        this.gameOver          = false;
+        this.renderTime        = tickRate * 100;
         this.currentRenderTime = 0;
     }
 
     // Draw Progress Bar
-    drawHealthBar(x, y, health){
-        ctx.fillRect(x, y, this.progressBarWidth, this.progressBarHeight); // Background
-        ctx.fillStyle = this.healthBarColor; // Change to health bar color
-        ctx.fillRect(x, y, health*2, this.progressBarHeight); // Health Overlay
-        ctx.fillStyle = this.fillColor;      // Revert to normal fill color
+    drawHealthBar(health, x, y){
+        ctx.fillRect(x, y, this.progressBarWidth, this.progressBarHeight);              // Background
+        ctx.fillStyle = this.healthBarColor;                                            // Change to health bar color
+        ctx.fillRect(x, y, health*(this.progressBarWidth/100), this.progressBarHeight); // Health Overlay
+        ctx.fillStyle = this.color;                                                     // Revert to normal fill color
     }
 
     // Get winners and create presentable string for who won
     winnerString(){
         var winnersText = "Game Over!\n";
         var winners      = getWinners();
+
         for (let index = 0; index < winners.length; index++) {
             winnersText += winners[index].toString();
             if(index < winners.length){
@@ -45,24 +48,41 @@ class Hud {
 
     draw(ctx) {
         
-        ctx.fillStyle  = this.color;    // Temporarily change fill color
+        ctx.font       = this.fontPrimary;  // Set main font
+        ctx.fillStyle  = this.color;        // Temporarily change fill color
 
         // Score
         var playersScore = players[0].score + " | " + players[1].score;
         ctx.fillText(playersScore, virtualWidth/2, 50);
 
-        // Player 1
-        this.drawHealthBar(0, virtualHeight - 100, players[0].health);
-        ctx.drawImage(bulletImage, 0, virtualHeight - 10 - this.iconSize, this.iconSize, this.iconSize);
-        ctx.fillText(players[0].ammo + "/" + players[0].maxAmmo, this.iconSize,  virtualHeight - 10);
-        ctx.drawImage(healthImage, 0, virtualHeight - 100, this.progressBarHeight, this.progressBarHeight);
+        // Players Stats (above each player's head)
+        for (let index = 0; index < players.length; index++) {
+            // Player variables
+            var x = players[index].x;
+            var y = players[index].y;
+            var name = players[index].name;
+            var health = players[index].health;
+            var ammo = players[index].ammo; var maxAmmo = players[index].maxAmmo;
 
-        // Player 2
-        this.drawHealthBar(virtualWidth-this.progressBarWidth, virtualHeight - 100, players[1].health);
-        ctx.drawImage(bulletImage, virtualWidth-this.progressBarWidth, virtualHeight - 10 - this.iconSize, this.iconSize, this.iconSize);
-        ctx.fillText(players[1].ammo + "/" + players[1].maxAmmo, virtualWidth-this.progressBarWidth+this.iconSize, virtualHeight - 10);
-        ctx.drawImage(healthImage, virtualWidth-this.progressBarWidth, virtualHeight - 100, this.progressBarHeight, this.progressBarHeight);
+            // Player's Name
+            ctx.font = this.fontSecondary;
+            ctx.fillText(name, x, y - 30);
+            
+            // Health Bar
+            ctx.font = this.fontExtra;
+            this.drawHealthBar(health, x, y-20);                                    
+            ctx.drawImage(healthImage, x, y-20, this.progressBarHeight, this.progressBarHeight);
 
+            // Ammo stats
+            ctx.drawImage(bulletImage,         x-5,             y-10, this.iconSize, this.iconSize);
+            ctx.fillText(ammo + "/" + maxAmmo, x+this.iconSize, y+5);
+            
+            ctx.font = this.fontPrimary; // Revert main font
+        }
+
+        /*
+        * Overlays
+        */
 
         // New Round Overlay
         if(this.newRound){
@@ -95,6 +115,6 @@ class Hud {
             }
         }
         
-        ctx.fillStyle = this.fillColor; // Revert normal fill color 
+        ctx.fillStyle = this.color; // Revert normal fill color 
     }
 }
