@@ -12,12 +12,49 @@ class Hud {
         this.healthBarColor    = "green";
         this.iconSize          = this.progressBarHeight*2;
         this.color             = color;
+        this.buttons           = [];
 
         // Render for special events
         this.newRound          = false;
         this.gameOver          = false;
+        this.isPaused          = false;
         this.renderTime        = tickRate * 100;
         this.currentRenderTime = 0;
+
+        // Create Menu Buttons
+        var scaleHeight = 4;
+        var scaleWidth  = 3;
+        var spacing     = 40;
+        this.buttons = [];
+        //this.buttons.push(new Button("Resume", x, y, width, height, bgColor, fontColor));
+        this.buttons.push(new Button("Quit", (virtualWidth/2), ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*2+virtualHeight/(scaleHeight*6)-5), virtualWidth/scaleWidth, virtualHeight/(scaleHeight*6), "gray", "white"));
+        // (virtualWidth/2)-(virtualWidth/scaleWidth)/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*index), )
+        // resumeText,)
+    }
+
+    // Pause Menu
+    drawPauseMenu(){
+
+
+        for (let index = 0; index < this.buttons.length; index++) {
+            this.buttons[index].draw(ctx);
+        }
+
+        ctx.fillRect((this.virtualWidth/2)-(this.virtualWidth/this.scaleWidth)/2, (this.virtualHeight/2)-(this.virtualHeight/this.scaleHeight)/2, this.virtualWidth/this.scaleWidth, this.virtualHeight/this.scaleHeight); // Background
+        ctx.fillStyle = "gray";
+        ctx.fillText("Paused",(this.virtualWidth/2)-ctx.measureText("Paused").width/2, ((this.virtualHeight/2)-(this.virtualHeight/this.scaleHeight)/2)+this.spacing);
+
+
+
+        /* Quit Button
+        ctx.fillStyle = "gray";
+        const quitPath = new Path2D();
+        quitPath.rect((virtualWidth/2)-(virtualWidth/scaleWidth)/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*3), virtualWidth/scaleWidth, virtualHeight/(scaleHeight*6));
+        quitPath.closePath();
+        ctx.fill(quitPath);
+        ctx.fillStyle = "white";
+        ctx.fillText(quitText,(virtualWidth/2)-ctx.measureText(quitText).width/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*3+virtualHeight/(scaleHeight*6)-5));*/
+
     }
 
     // Draw Progress Bar
@@ -113,6 +150,12 @@ class Hud {
                 this.gameOver          = false;
                 this.currentRenderTime = 0;
             }
+        }
+
+        // Paused Menu
+        this.isPaused = true;
+        if(this.isPaused){
+            this.drawPauseMenu();
         }
         
         ctx.fillStyle = this.color; // Revert normal fill color 

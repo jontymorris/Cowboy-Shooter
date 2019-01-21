@@ -53,7 +53,7 @@ function init() {
     for (let index = 0; index < players.length; index++) {
         players[index].enemys = players.slice();
         players[index].enemys.splice(index,1);
-        players[index].name = "Player " + (index+1); 
+        players[index].name = "Player " + (index+1); // Give player's their name
     }
 
     // Init HUD
