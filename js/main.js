@@ -121,8 +121,12 @@ window.onkeydown = function(e) {
 
 // Key up events
 window.onkeyup = function(e) {
-    for (let index = 0; index < players.length; index++) {
-        players[index].keyUp(e.keyCode);
+    // Toggle Menu 
+    if (e.keyCode == 27){ hud.isPaused = !hud.isPaused}
+    else{
+        for (let index = 0; index < players.length; index++) {
+            players[index].keyUp(e.keyCode);
+        }
     }
 }
 

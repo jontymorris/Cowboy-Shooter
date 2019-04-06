@@ -21,40 +21,35 @@ class Hud {
         this.renderTime        = tickRate * 100;
         this.currentRenderTime = 0;
 
+        this.buttons = [
+            {
+              name: 'resume',
+              background: 'gray',
+              font: 'black',
+              callback: function(){
+                //this.isPaused = false;
+              }
+            },
+            {
+              name: 'quit',
+              background: 'gray',
+              font: 'black',
+              callback: function(){
+                console.log('exit');
+              }
+            }
+        ];
+
         // Create Menu Buttons
-        var scaleHeight = 4;
-        var scaleWidth  = 3;
-        var spacing     = 40;
-        this.buttons = [];
-        //this.buttons.push(new Button("Resume", x, y, width, height, bgColor, fontColor));
-        this.buttons.push(new Button("Quit", (virtualWidth/2), ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*2+virtualHeight/(scaleHeight*6)-5), virtualWidth/scaleWidth, virtualHeight/(scaleHeight*6), "gray", "white"));
-        // (virtualWidth/2)-(virtualWidth/scaleWidth)/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*index), )
-        // resumeText,)
-    }
-
-    // Pause Menu
-    drawPauseMenu(){
-
-
-        for (let index = 0; index < this.buttons.length; index++) {
-            this.buttons[index].draw(ctx);
+        this.mm = new MenuManager();
+        for (let i = 0; i < this.buttons.length; i++) {
+            this.mm.buttons.push(new Button(
+                this.buttons[i].name,
+                this.buttons[i].background,
+                this.buttons[i].font,
+                this.buttons[i].callback    
+            ));
         }
-
-        ctx.fillRect((this.virtualWidth/2)-(this.virtualWidth/this.scaleWidth)/2, (this.virtualHeight/2)-(this.virtualHeight/this.scaleHeight)/2, this.virtualWidth/this.scaleWidth, this.virtualHeight/this.scaleHeight); // Background
-        ctx.fillStyle = "gray";
-        ctx.fillText("Paused",(this.virtualWidth/2)-ctx.measureText("Paused").width/2, ((this.virtualHeight/2)-(this.virtualHeight/this.scaleHeight)/2)+this.spacing);
-
-
-
-        /* Quit Button
-        ctx.fillStyle = "gray";
-        const quitPath = new Path2D();
-        quitPath.rect((virtualWidth/2)-(virtualWidth/scaleWidth)/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*3), virtualWidth/scaleWidth, virtualHeight/(scaleHeight*6));
-        quitPath.closePath();
-        ctx.fill(quitPath);
-        ctx.fillStyle = "white";
-        ctx.fillText(quitText,(virtualWidth/2)-ctx.measureText(quitText).width/2, ((virtualHeight/2)-(virtualHeight/scaleHeight)/2 + spacing*3+virtualHeight/(scaleHeight*6)-5));*/
-
     }
 
     // Draw Progress Bar
@@ -88,9 +83,14 @@ class Hud {
         ctx.font       = this.fontPrimary;  // Set main font
         ctx.fillStyle  = this.color;        // Temporarily change fill color
 
+        // Paused Menu
+        if(this.isPaused){
+            this.mm.draw(ctx);
+        }
+
         // Score
         var playersScore = players[0].score + " | " + players[1].score;
-        ctx.fillText(playersScore, virtualWidth/2, 50);
+        ctx.fillText(playersScore, virtualWidth/2-ctx.measureText(playersScore).width/2, 50);
 
         // Players Stats (above each player's head)
         for (let index = 0; index < players.length; index++) {
@@ -150,12 +150,6 @@ class Hud {
                 this.gameOver          = false;
                 this.currentRenderTime = 0;
             }
-        }
-
-        // Paused Menu
-        this.isPaused = true;
-        if(this.isPaused){
-            this.drawPauseMenu();
         }
         
         ctx.fillStyle = this.color; // Revert normal fill color 
