@@ -135,7 +135,7 @@ window.onkeyup = function(e) {
  */
 function update() {
 
-    // sort the players
+    // Sort the players
     players.sort(function(a, b) {
         return a.y - b.y;
     });
@@ -158,6 +158,7 @@ function update() {
             }
         }
     }
+    
     draw();
 }
 
