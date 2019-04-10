@@ -135,6 +135,11 @@ window.onkeyup = function(e) {
  */
 function update() {
 
+    // sort the players
+    players.sort(function(a, b) {
+        return a.y - b.y;
+    });
+
     // Count how many players are alive
     alive = 0;
     for (let index = 0; index < players.length; index++) {
