@@ -39,7 +39,7 @@ function init() {
     resizeCanvas();
     
     // Game Variables
-    tickRate = 1000/60;
+    tickRate = 1000/120;
     scoreIncrement = 1;
     rounds = 0;
     roundAmountForGameOver = 5;
