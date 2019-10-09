@@ -12,7 +12,6 @@ class Hud {
         this.healthBarColor    = "green";
         this.iconSize          = this.progressBarHeight*2;
         this.color             = color;
-        this.buttons           = [];
 
         // Render for special events
         this.newRound          = false;
@@ -21,35 +20,6 @@ class Hud {
         this.renderTime        = tickRate * 100;
         this.currentRenderTime = 0;
 
-        this.buttons = [
-            {
-              name: 'resume',
-              background: 'gray',
-              font: 'black',
-              callback: function(){
-                //this.isPaused = false;
-              }
-            },
-            {
-              name: 'quit',
-              background: 'gray',
-              font: 'black',
-              callback: function(){
-                console.log('exit');
-              }
-            }
-        ];
-
-        // Create Menu Buttons
-        this.mm = new MenuManager();
-        for (let i = 0; i < this.buttons.length; i++) {
-            this.mm.buttons.push(new Button(
-                this.buttons[i].name,
-                this.buttons[i].background,
-                this.buttons[i].font,
-                this.buttons[i].callback    
-            ));
-        }
     }
 
     // Draw Progress Bar
@@ -78,15 +48,21 @@ class Hud {
         return winnersText;
     }
 
+    toggleMenu(){
+        var menuElement = document.getElementById("controls");
+        if (menuElement.style.display == 'none')
+            menuElement.style.display = 'block';
+        else
+            menuElement.style.display = 'none';
+    }
+
     draw(ctx) {
         
         ctx.font       = this.fontPrimary;  // Set main font
         ctx.fillStyle  = this.color;        // Temporarily change fill color
 
         // Paused Menu
-        if(this.isPaused){
-            this.mm.draw(ctx);
-        }
+        if(this.isPaused){}
 
         // Score
         var playersScore = players[0].score + " | " + players[1].score;

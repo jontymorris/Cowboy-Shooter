@@ -1,5 +1,5 @@
 // Canvas
-var canvas = document.getElementById("gameCanvas");
+var canvas = document.getElementById("viewport");
 var ctx    = canvas.getContext("2d");
 
 var canvasWidth;
@@ -24,6 +24,7 @@ var tickRate;
 var scoreIncrement;
 var rounds;
 var roundAmountForGameOver;
+var isPaused;
 
 /**
  * Init the game
@@ -43,6 +44,7 @@ function init() {
     scoreIncrement = 1;
     rounds = 0;
     roundAmountForGameOver = 5;
+    isPaused = false;
 
     // Establish Players
     players = [];
@@ -114,15 +116,19 @@ function resizeCanvas() {
 
 // Key down events
 window.onkeydown = function(e) {
-    for (let index = 0; index < players.length; index++) {
-        players[index].keyDown(e.keyCode);
-    }
+    if (!this.isPaused){ // Deny movement when paused
+        for (let index = 0; index < players.length; index++) {
+            players[index].keyDown(e.keyCode);
+        }
+    }   
 }
 
 // Key up events
 window.onkeyup = function(e) {
     // Toggle Menu 
-    if (e.keyCode == 27){ hud.isPaused = !hud.isPaused}
+    if (e.keyCode == 27){
+        this.pause();
+    }
     else{
         for (let index = 0; index < players.length; index++) {
             players[index].keyUp(e.keyCode);
@@ -177,6 +183,14 @@ function draw() {
     for (let index = 0; index < players.length; index++) {
         players[index].draw(ctx);
     }
+}
+
+/**
+ * Handle pause/resume events
+ */
+function pause(){
+    isPaused = !isPaused;
+    hud.toggleMenu();
 }
 
 init(); // Setup the game

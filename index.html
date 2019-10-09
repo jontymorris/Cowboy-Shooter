@@ -20,8 +20,16 @@
             <img id="healthImage" src="assets/health.png">
         </div>
 
-        <!-- Game canvas -->
-        <canvas width="1280" height="720" id="gameCanvas"></canvas>
+        <!-- Game canvas and controls-->
+        <div id="container">
+            <canvas width="1280" height="720" id="viewport"></canvas>
+            <menu id="controls" style="display: none">
+                <h1>Paused</h1>
+                <hr>
+                <button onclick="pause()">Resume</button><br>
+                <button onclick="alert('this feature is still coming ;)')">Settings</button>
+            </menu>
+        </div>
 
         <!-- Libraries -->
         <script
